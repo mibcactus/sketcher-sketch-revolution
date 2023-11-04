@@ -1,10 +1,37 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using OpenCvSharp;
 
 namespace SSR;
 
 public static class StaticUtil {
+
+    public static bool isPressed(ButtonState _bs) {
+        if (_bs == ButtonState.Pressed) {
+            return true;
+        }
+
+        return false;
+    }
+    
+    public static Texture2D genBasicTexture2D(GraphicsDevice _graphicsDevice, Color color, int width = 100, int height = 100) {
+        Texture2D _t = new Texture2D(_graphicsDevice, width, height);
+
+        int h = width * height;
+        Color[] data = new Color[h];
+
+        for (int i = 0; i < h; i++) {
+            int q = i / 200;
+            q += 30;
+
+            data[i] = color;
+        }
+        
+        _t.SetData(data);
+        
+        return _t;
+    }
     
     public static Texture2D genPlaceholderTexture2D(GraphicsDevice _graphicsDevice, int width = 100, int height = 100) {
         Texture2D _t = new Texture2D(_graphicsDevice, width, height);

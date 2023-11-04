@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace SSR; 
 
@@ -7,6 +8,7 @@ public abstract class State {
     protected StateID _stateID;
     protected Texture2D _backgroundTxt;
     protected DependencyContainer _dependencyBox;
+    protected GamePadState _gamePadState;
 
     public State(DependencyContainer dependencyBox) {
         _dependencyBox = dependencyBox;

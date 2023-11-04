@@ -23,7 +23,7 @@ public class Game1 : Game {
     private State _state;
 
     private List<State> _state_list = new List<State>();
-    
+
     public Game1() {
         
         _graphics = new GraphicsDeviceManager(this);
@@ -34,11 +34,10 @@ public class Game1 : Game {
         Trace.Listeners.Add(new ConsoleTraceListener());
     }
 
-    protected override void Initialize()
-    {
-        // TODO: Add your initialization logic here
+    protected override void Initialize() {
 
         
+
         //open cv test stuff
         // open an image, convert to greyscale, create new texture 2D out of it
 
@@ -93,8 +92,11 @@ public class Game1 : Game {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        // TODO: Add your update logic here
-
+        if (_dependencyBox.screen_changed) {
+            _dependencyBox.updateScreenSizeInfo();
+            _dependencyBox.screen_changed = false;
+        }
+        
         _state.Update(gameTime);
         
         base.Update(gameTime);
@@ -102,6 +104,7 @@ public class Game1 : Game {
 
     protected override void Draw(GameTime gameTime)
     {
+        GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(bgcolour);
 
         // TODO: Add your drawing code here

@@ -25,6 +25,30 @@
 /processorParam:TextureFormat=Color
 /build:../resources/guy.png;guy.png
 
+#begin ../resources/pen_down.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../resources/pen_down.png;pen_down.png
+
+#begin ../resources/pen_up.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../resources/pen_up.png;pen_up.png
+
 #begin ../resources/test.png
 /importer:TextureImporter
 /processor:TextureProcessor
