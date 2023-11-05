@@ -69,9 +69,13 @@ public class Pen {
         return gamePadState.Triggers.Right < 0.5f;
     }
 
-    public void reset() {
+    public int reset(string image) {
+
+        int aaaa = StaticUtil.compareimages(image, _canvas.canvas);
         _canvas.resetCanvas();
         _position = _deps.CentreVector() + _canvas.centre + new Vector2(50,50);
+
+        return aaaa;
     }
 
     public void Update(GameTime gameTime, GamePadState gamePadState) {
@@ -115,7 +119,7 @@ public class Pen {
 
             ExtendedVector.X *= _velocity;
             ExtendedVector.Y *= _velocity;
-            Trace.WriteLine("\nExtendedVector: " + ExtendedVector);
+            //Trace.WriteLine("\nExtendedVector: " + ExtendedVector);
 
             if (dPad.Up == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.W)) {
                 _position -= ExtendedVector;

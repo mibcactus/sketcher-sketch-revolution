@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Diagnostics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using OpenCvSharp;
@@ -56,12 +58,48 @@ public static class StaticUtil {
         Texture2D text = genPlaceholderTexture2D(_graphicsDevice);
         return text;
     }*/
-    
-    /*
-    public static Mat Texture2DtoMat(Texture2D texture) {
-        Mat mat;
 
-        return mat;
-    }*/
+    public static int compareimages(string image, Texture2D drawing) {
+        try {
+            string aaa = @"C:\Users\Milica\Documents\Coding\Hacknotts\sketcher-sketch-revolution\SSR\resources\" +
+                         image + ".png";
+            Mat image_mat =
+                new Mat(aaa);
+
+            Mat drawing_mat = Texture2DtoMat(drawing);
+
+            Mat result = image_mat;
+            Cv2.Compare(image_mat, drawing_mat, result, CmpType.EQ);
+            int similar = Cv2.CountNonZero(result);
+
+            return similar;
+        }
+        catch (Exception e) {
+            Trace.WriteLine(e);
+            return 0;
+        }
+    }
+    
+    public static Mat Texture2DtoMat(Texture2D texture) {
+        // mat with 8bit signed per channel
+        try {
+            Mat mat = new Mat(new Size(texture.Width, texture.Height), MatType.CV_8S, Scalar.White);
+            Color[] temp = new Color[texture.Width * texture.Height];
+            texture.GetData<Color>(temp);
+            for (int i = 0; i < mat.Width; i++) {
+                for (int j = 0; j < mat.Height; j++) {
+                    if(temp[i+j*texture.Width] == Color.Black) {
+                        mat.Set(i, j, Scalar.Black);
+                    }
+                }
+            }
+
+            return mat;
+        }
+        catch (Exception e) {
+            Console.WriteLine(e);
+            return new Mat();
+        }
+    }
 }
 

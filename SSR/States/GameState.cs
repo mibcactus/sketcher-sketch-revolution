@@ -20,6 +20,8 @@ public class GameState : State {
     private List<Texture2D> _images = new List<Texture2D>();
     private int _image_index = 0;
 
+    private int score = 0;
+
     public GameState(DependencyContainer deps) : base(deps) {
         _canvas_pos.X = _deps.screen_width - 320;
         _canvas_pos.Y = 20;
@@ -42,13 +44,14 @@ public class GameState : State {
         }
 
         if (_deps.hasTimerpassed(180)) {
+            score += _pen.reset("image"+ (_image_index + 1));
             if (_image_index == 3) {
                 _image_index = 0;
             }
             else {
                 _image_index++;
             }
-            _pen.reset();
+            
             _deps.timeSinceRoundStarted = DateTime.Now;
         }
 
@@ -70,7 +73,10 @@ public class GameState : State {
         Vector2 pos = new Vector2(10, 10);
         string srr = (DateTime.Now.Second - _deps.timeSinceRoundStarted.Second).ToString();
         string time_str = "00:" + srr;
+        string scr = "Score: " + score;
 
         _deps._SpriteBatch.DrawString(_deps.big_font, srr, pos, text_colour);
+        pos.Y += 30;
+        _deps._SpriteBatch.DrawString(_deps.big_font, scr, pos, text_colour);
     }
 }

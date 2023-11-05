@@ -8,7 +8,7 @@ namespace SSR;
 
 public class Canvas {
     private const int BRUSH_DEFAULT = 5;
-    private Texture2D canvas;
+    public Texture2D canvas;
     private Color[] data;
     private int data_size;
     private DependencyContainer _dependencyBox;
