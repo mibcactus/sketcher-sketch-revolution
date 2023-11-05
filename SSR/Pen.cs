@@ -14,7 +14,7 @@ public class Pen {
         ButtonState.Released, ButtonState.Released,
         ButtonState.Released, ButtonState.Released);
 
-    private DependencyContainer _dependencyBox;
+    private DependencyContainer _deps;
 
     private Texture2D down_texture;
     private Texture2D up_texture;
@@ -24,33 +24,31 @@ public class Pen {
     private Vector2 _origin_offset;
     private float _angle = 0f;
 
-    private float _rotation_speed = 0.15f;
+    private float _rotation_speed = 0.05f;
 
     private Vector2 vector_speed = Vector2.Zero;
 
-    private const int MAX_SPEED = 30;
+    private const int MAX_SPEED = 10;
     private const int MIN_SPEED = 1;
-    private int _velocity = 15;
+    private float _velocity = 0.7f;
 
 
     public bool isDown = true;
 
     private Canvas _canvas;
 
-    public Pen(DependencyContainer _dependencies) {
-        _dependencyBox = _dependencies;
-
-        _position = _dependencies.CentreVector();
-
-        // TODO: Add appropriate textures
-        down_texture = _dependencyBox.loadTexture2D("pen_down");
+    public Pen(DependencyContainer _dependencies, Vector2 canvas_position, int canvas_width = 800,
+        int canvas_height = 600) {
+        _deps = _dependencies;
         
-        up_texture = _dependencyBox.loadTexture2D("pen_up");
+        down_texture = _deps.loadTexture2D("pen_down");
+        up_texture = _deps.loadTexture2D("pen_up");
         current_texture = down_texture;
 
         _origin_offset = new Vector2(up_texture.Width / 2, up_texture.Height / 2);
 
-        _canvas = new Canvas(_dependencies, new Vector2(200, 200));
+        _canvas = new Canvas(_dependencies, canvas_position, canvas_width, canvas_height);
+        _position = _dependencies.CentreVector() + _canvas.centre + new Vector2(50,50);
         Trace.Listeners.Add(new ConsoleTraceListener());
     }
 
@@ -71,94 +69,30 @@ public class Pen {
         return gamePadState.Triggers.Right < 0.5f;
     }
 
-    /*
-    private void old() {
-        if (dPad.Up == ButtonState.Pressed) {
-            displacement.Y += _pixel_speed;
-        }
-
-        if (dPad.Down == ButtonState.Pressed) {
-            displacement.Y -= _pixel_speed;
-        }
-
-        //if (RotatePressed(dPad)) {
-        
-        float temp_angle = 0;
-        if (dPad.Left == ButtonState.Pressed) {
-            temp_angle -= _rotation_speed;
-        }
-
-        if (dPad.Right == ButtonState.Pressed) {
-            temp_angle += _rotation_speed;
-        }
-
-        _angle += temp_angle;
-
-        if (_angle > MAX_RADIAN) {
-            _angle -= MAX_RADIAN;
-        }
-        else if (_angle < 0) {
-            _angle = MAX_RADIAN - _angle;
-        }
-        //}
-
-        double degree_angle = (180 / Pi) * _angle;
-        //double degree_angle = temp_angle * (180 / Pi);
-
-
-
-        float newx = (float)Math.Floor((Math.Cos(degree_angle) * displacement.X) -
-                                       (Math.Sin(degree_angle) * displacement.Y));
-        float newy = (float)Math.Floor((Math.Sin(degree_angle) * displacement.X) -
-                                       (Math.Cos(degree_angle) * displacement.Y));
-
-        displacement.X = newx;
-        displacement.Y = newy;
-
-        displacement.Normalize();
-        displacement = Vector2.Multiply(displacement, _pixel_speed);
-
-        if (dPad.Up == ButtonState.Pressed) {
-            _position -= displacement;
-        }
-
-        if (dPad.Down == ButtonState.Pressed) {
-            _position += displacement;
-        }
-            
-    }*/
-
+    public void reset() {
+        _canvas.resetCanvas();
+        _position = _deps.CentreVector() + _canvas.centre + new Vector2(50,50);
+    }
 
     public void Update(GameTime gameTime, GamePadState gamePadState) {
-        /*if (!buttonsPressed(gamePadState)) {
-            return;
-        }*/
+        _deps.updateInputBuffer();
 
-        _dependencyBox.updateInputBuffer();
-
-        if (gamePadState.IsButtonDown(Buttons.Start)) {
-            _dependencyBox.paused = !_dependencyBox.paused;
-        }
-        /*
-        if (gamePadState.IsButtonDown(Buttons.RightTrigger)) {
+        if (gamePadState.IsButtonDown(Buttons.RightShoulder) && _deps.hasInputBufferElapsed()) {
             isDown = !isDown;
-        }*/
-
-        isDown = true;
+            _deps.updateInputBuffer();
+        }
         
         if (isDown) {
             if (gamePadState.IsButtonDown(Buttons.B)) {
-                _velocity -= 3;
+                _velocity -= 0.5f;
             }
 
             if (gamePadState.IsButtonDown(Buttons.A)) {
-                _velocity += 3;
+                _velocity += 0.5f;
             }
-        
-            _canvas.setBrushSize(_velocity);
-            
+
             GamePadDPad dPad = gamePadState.DPad;
-        
+
             float temp_angle = 0;
             if (dPad.Left == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.A)) {
                 temp_angle -= _rotation_speed;
@@ -168,7 +102,7 @@ public class Pen {
                 temp_angle += _rotation_speed;
             }
 
-        
+
             _angle += temp_angle;
             if (_angle > MAX_RADIAN) {
                 _angle -= MAX_RADIAN;
@@ -176,14 +110,13 @@ public class Pen {
             else if (_angle < 0) {
                 _angle = MAX_RADIAN - _angle;
             }
-        
-            Vector2 ExtendedVector = new Vector2((float) Math.Cos(_angle), (float) Math.Sin(_angle));
-            //ExtendedVector.Normalize();
-            //Vector2.Multiply(ExtendedVector, _pixel_speed);
+
+            Vector2 ExtendedVector = new Vector2((float)Math.Cos(_angle), (float)Math.Sin(_angle));
+
             ExtendedVector.X *= _velocity;
             ExtendedVector.Y *= _velocity;
             Trace.WriteLine("\nExtendedVector: " + ExtendedVector);
-        
+
             if (dPad.Up == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.W)) {
                 _position -= ExtendedVector;
             }
@@ -191,7 +124,22 @@ public class Pen {
             if (dPad.Down == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.S)) {
                 _position += ExtendedVector;
             }
-            
+
+            if (_position.X < _canvas.screen_position.X - _origin_offset.X ) {
+                _position.X = _canvas.screen_position.X - _origin_offset.X;
+            }
+                
+            if(_position.X > _canvas.screen_position.X + _canvas.getCanvas().Width - _origin_offset.X) {
+                _position.X = _canvas.getCanvas().Width + _canvas.screen_position.X - _origin_offset.X;
+            }
+
+            if (_position.Y < _canvas.screen_position.Y - _origin_offset.Y) {
+                _position.Y = _canvas.screen_position.Y - _origin_offset.Y;
+            }
+            if (_position.Y > _canvas.screen_position.Y + _canvas.getCanvas().Height- _origin_offset.Y ) {
+                _position.Y = _canvas.screen_position.Y + _canvas.getCanvas().Height- _origin_offset.Y;
+            }
+
             current_texture = down_texture;
             _canvas.updateCanvas(_position + _origin_offset);
         }
@@ -210,9 +158,14 @@ public class Pen {
 
     public void Draw() {
         _canvas.drawCanvas();
-        //_dependencyBox._SpriteBatch.Draw(current_texture, _position, Color.White);
-        var rotate_angle = _angle + 1.5f*Pi;
-        _dependencyBox._SpriteBatch.Draw(current_texture, _position + _origin_offset, null, Color.White, rotate_angle,
-            _origin_offset, Vector2.One, SpriteEffects.None, 0f);
+        var rotate_angle = _angle + 1.5f * Pi;
+        try {
+            _deps._SpriteBatch.Draw(current_texture, _position + _origin_offset, null, Color.White,
+                rotate_angle,
+                _origin_offset, Vector2.One, SpriteEffects.None, 0f);
+        }
+        catch (Exception e) {
+            Console.WriteLine(e);
+        }
     }
 }

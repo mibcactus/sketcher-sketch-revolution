@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,7 +12,7 @@ using OpenCvSharp.Text;
 namespace SSR;
 
 public class Game1 : Game {
-    private DependencyContainer _dependencyBox;
+    private DependencyContainer _deps;
     
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
@@ -21,16 +20,13 @@ public class Game1 : Game {
     private RenderTarget2D _nativeRenderTarget;
     private Rectangle _actualScreenRectangle;
     
-    private const int screenWidth = 960;
-    private const int screenHeight = 540;
+    public const int screenWidth = 960;
+    public const int screenHeight = 540;
     private int scaleSize = 2;
     
     private Color bgcolour = Color.CornflowerBlue;
 
-    private State _state;
-
-    //private List<State> _state_list = new List<State>();
-    private Dictionary<string, State> _state_dict = new Dictionary<string, State>();
+    
 
     public Game1() {
         
@@ -53,6 +49,8 @@ public class Game1 : Game {
         IsMouseVisible = true;
     }
 
+    
+    
     protected override void Initialize() {
         _nativeRenderTarget = new RenderTarget2D(GraphicsDevice, screenWidth, screenHeight);
         //open cv test stuff
@@ -86,18 +84,22 @@ public class Game1 : Game {
     protected override void LoadContent() {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         
-        _dependencyBox = new DependencyContainer(this, _spriteBatch);
-        _dependencyBox.updateScreenSizeInfo();
+        _deps = new DependencyContainer(this, _spriteBatch);
+        _deps.updateScreenSizeInfo();
         
 
         
-        //_state_dict.Add("menu", new MenuState(_dependencyBox));
-        _state_dict.Add("misc", new MiscState(_dependencyBox));
+        _deps._state_dict.Add("menu", new MenuState(_deps));
+        _deps._state_dict.Add("misc", new MiscState(_deps));
+        _deps._state_dict.Add("game", new GameState(_deps));
         
-        foreach (var item in _state_dict) {
+        foreach (var item in _deps._state_dict) {
             item.Value.LoadContent();
         }
-        _state = _state_dict["misc"];
+
+        _deps._new_state = "menu";
+        _deps.updateState();
+        //_deps._state = _deps._state_dict["menu"];
 
 
         // TODO: use this.Content to load your game content here
@@ -107,12 +109,17 @@ public class Game1 : Game {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        if (_dependencyBox.screen_changed) {
-            _dependencyBox.updateScreenSizeInfo();
-            _dependencyBox.screen_changed = false;
+        if (_deps.screen_changed) {
+            _deps.updateScreenSizeInfo();
+            _deps.screen_changed = false;
+        }
+
+        if (_deps.state_changed) {
+            _deps.updateState();
+            _deps.state_changed = false;
         }
         
-        _state.Update(gameTime);
+        _deps._state.Update(gameTime);
         
         base.Update(gameTime);
     }
@@ -122,7 +129,7 @@ public class Game1 : Game {
         GraphicsDevice.Clear(bgcolour);
 
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        _state.Draw(gameTime);
+        _deps._state.Draw(gameTime);
         _spriteBatch.End();
         
         base.Draw(gameTime);

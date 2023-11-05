@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -11,15 +13,17 @@ public class Canvas {
     private int data_size;
     private DependencyContainer _dependencyBox;
 
-    private Vector2 screen_position;
+    public Vector2 screen_position;
 
-    private int brush_size = 10;
-   
+    private int brush_size = 5;
+
+    public Vector2 centre;
 
     public Canvas(DependencyContainer _dependencyContainer, Vector2 screenPosition,int canvas_width = 800, int canvas_height = 600) {
         _dependencyBox = _dependencyContainer;
 
         data_size = canvas_width * canvas_height;
+        centre = new Vector2(canvas_width / 2, canvas_height / 2);
         data = new Color[data_size];
         canvas = new Texture2D(_dependencyContainer._gamePointer.GraphicsDevice, canvas_width, canvas_height);
         for (int i = 0; i < data_size; i++) {
@@ -30,6 +34,43 @@ public class Canvas {
         screen_position = screenPosition;
     }
 
+
+    public void resetCanvas() {
+        saveCanvas();
+        clearCanvas();
+    }
+    
+   /* public string findFilename(string filename = "picture.png") {
+        Random random = new Random();
+        if(!File.Exists(filename))
+            return filename;
+        else {
+            filename = random.Next(10000) + ".png";
+        }
+        
+    }*/
+
+    public void saveCanvas() {
+        Random rand = new Random();
+        string filename = rand.Next(100000) + ".png";
+        string path = @"C:\Users\Milica\Documents\Coding\Hacknotts\sketcher-sketch-revolution\SSR\drawings\";
+        //filename = findFilename(filename);
+        try {Stream stream = File.Create(path + filename);
+            canvas.SaveAsPng(stream, canvas.Width,canvas.Height);
+            stream.Dispose(); }
+        catch (Exception e) {
+            Trace.WriteLine(e);
+        }
+        
+    }
+
+    public void clearCanvas() {
+        for (int i = 0; i < data_size; i++) {
+            data[i] = Color.White;
+        }
+        canvas.SetData(data);
+    }
+    
     public void setBrushSize(int size) {
         brush_size = size;
     }
@@ -69,6 +110,7 @@ public class Canvas {
         
     }
     
+
     public void updateColourAtIndex(int index) {
         data[index] = Color.Black;
     }

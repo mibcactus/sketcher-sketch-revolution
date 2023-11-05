@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using OpenCvSharp;
 
 namespace SSR;
@@ -17,10 +17,8 @@ public enum StateID {
 }
 
 public class DependencyContainer {
-    public bool paused = false;
     public bool state_changed = false;
     public bool screen_changed = false;
-    public Color bg_colour;
 
     public int screen_width;
     public int screen_height;
@@ -28,38 +26,79 @@ public class DependencyContainer {
     public Texture2D placeholder;
 
     private SpriteFont font;
+    public SpriteFont big_font;
     
     // engine stuff?
     public Game _gamePointer;
     public SpriteBatch _SpriteBatch;
 
     private DateTime timePressed = DateTime.Now;
+    public DateTime timeSinceRoundStarted = DateTime.Now;
+    
+    public State _state;
+    public string _new_state;
+
+    //private List<State> _state_list = new List<State>();
+    public Dictionary<string, State> _state_dict = new Dictionary<string, State>();
 
     public DependencyContainer(Game gamePointer, SpriteBatch spriteBatchPointer) {
-        this._gamePointer = gamePointer;
-        this._SpriteBatch = spriteBatchPointer;
-        this.font = _gamePointer.Content.Load<SpriteFont>("SSRFont");
+        _gamePointer = gamePointer;
+        _SpriteBatch = spriteBatchPointer;
+        font = _gamePointer.Content.Load<SpriteFont>("SSRFont");
+        big_font = _gamePointer.Content.Load<SpriteFont>("BigFont");
         placeholder = StaticUtil.genPlaceholderTexture2D(_gamePointer.GraphicsDevice);
         
         updateScreenSizeInfo();
     }
     
+    public bool SetState(string new_state) {
+        if(_state_dict.ContainsKey(new_state)) {
+            _new_state = new_state;
+            state_changed = true;
+            return true;
+        }
+        return false;
+    }
+
+    public void updateState() {
+        _state = _state_dict[_new_state];
+        state_changed = false;
+        if (_new_state == "game") {
+            timeSinceRoundStarted = DateTime.Now;
+        }
+    }
+
+    public void resetTimer() {
+        timeSinceRoundStarted = DateTime.Now;
+    }
+
+    public int secs() {
+        return timeSinceRoundStarted.Second;
+    }
     
     public void updateInputBuffer() {
         timePressed = DateTime.Now;
     }
-    public bool hasInputBufferElapsed(float seconds = 0.1f) {
-        return DateTime.Now > timePressed.AddSeconds(0.05);
+    public bool hasInputBufferElapsed(float seconds = 0.05f) {
+        return DateTime.Now > timePressed.AddSeconds(seconds);
+    }
+
+    public bool hasTimerpassed(float seconds = 30) {
+        return DateTime.Now > timeSinceRoundStarted.AddSeconds(30);
+    }
+
+    public DateTime getTimer() {
+        return timeSinceRoundStarted;
     }
     
     public void updateScreenSizeInfo() {
-        screen_width = _gamePointer.GraphicsDevice.PresentationParameters.BackBufferWidth;
-        screen_height = _gamePointer.GraphicsDevice.PresentationParameters.BackBufferHeight;
+        screen_width = 960;
+        screen_height = 540;
     }
 
     public Vector2 CentreVector() {
-        int x = (int) Math.Floor((double)  (screen_width / 2));
-        int y = (int) Math.Floor((double) (screen_height / 2));
+        int x = 960 / 2;
+        int y = 540 / 2;
         return new Vector2(x, y);
     }
 
