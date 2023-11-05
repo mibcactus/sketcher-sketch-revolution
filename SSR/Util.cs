@@ -10,7 +10,9 @@ namespace SSR;
 public enum StateID {
     MENU,
     GAME,
-    TEST,
+    SCORE,
+    CREDITS,
+    OPTIONS,
     MISC
 }
 
@@ -24,8 +26,6 @@ public class DependencyContainer {
     public int screen_height;
 
     public Texture2D placeholder;
-    private int placeholder_width = 100;
-    private int placeholder_height = 100;
 
     private SpriteFont font;
     
@@ -43,7 +43,8 @@ public class DependencyContainer {
         
         updateScreenSizeInfo();
     }
-
+    
+    
     public void updateInputBuffer() {
         timePressed = DateTime.Now;
     }

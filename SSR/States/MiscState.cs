@@ -31,9 +31,11 @@ public class MiscState : State {
         } else {
             _dependencyBox.paused = false;
 
-            if(_dependencyBox.hasInputBufferElapsed()) {
-                _pen.Update(gameTime, _gamePadState);
-            }
+            
+        }
+        
+        if(_dependencyBox.hasInputBufferElapsed()) {
+            _pen.Update(gameTime, _gamePadState);
         }
     }
 
@@ -64,6 +66,7 @@ public class MiscState : State {
 
         string angle_str = "Current angle: " + _pen.returnAngle() + " is this many degrees: " + _pen.toDegrees();
         _dependencyBox._SpriteBatch.DrawString(_dependencyBox.Font(), angle_str, new Vector2(30, 190), textcolour);
+        //string pn = "Unit vector: "
 
     }
 }
