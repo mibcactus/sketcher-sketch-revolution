@@ -13,7 +13,8 @@ public class GameState : State {
     // the size of the images and canvas
     private Vector2 _pic_res = new Vector2(300, 490);
     private Vector2 _canvas_pos = Vector2.Zero;
-    
+
+    private Texture2D babe;
     //private bool timer_on = false;
 
     // used for storing the images shown to the player
@@ -34,6 +35,8 @@ public class GameState : State {
         _images.Add(_deps.loadTexture2D("image1"));
         _images.Add(_deps.loadTexture2D("image2"));
         _images.Add(_deps.loadTexture2D("image3"));
+
+        babe = _deps.loadTexture2D("babe");
     }
 
     public override void Update(GameTime gameTime) {
@@ -44,8 +47,8 @@ public class GameState : State {
         }
 
         if (_deps.hasTimerpassed(180)) {
-            score += _pen.reset("image"+ (_image_index + 1));
-            if (_image_index == 3) {
+            score += _pen.reset("image" + (_image_index + 1));
+            if (_image_index == 2) {
                 _image_index = 0;
             }
             else {
@@ -67,6 +70,9 @@ public class GameState : State {
             image_pos.X = _canvas_pos.X - _pic_res.X - 20,
             image_pos.Y = _canvas_pos.Y);
         _deps._SpriteBatch.Draw(_images[_image_index], image_pos, Color.White);
+
+        image_pos.X -= _pic_res.X - 10;
+        _deps._SpriteBatch.Draw(babe, image_pos, Color.White);
         
         _pen.Draw();
         

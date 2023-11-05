@@ -13,6 +13,18 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin ../resources/babe.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../resources/babe.png;babe.png
+
 #begin ../resources/game_bg.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -72,6 +84,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../resources/image3.png;image3.png
+
+#begin ../resources/mario.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:../resources/mario.mp3;mario.mp3
 
 #begin ../resources/menu_bg.png
 /importer:TextureImporter

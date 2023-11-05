@@ -18,6 +18,6 @@ public class MenuState : State {
     public override void Draw(GameTime gameTime) {
         _deps._SpriteBatch.Draw(_backgroundTxt, Vector2.Zero, Color.White);
         
-        _deps._SpriteBatch.Draw(_deps.placeholder, _deps.CentreVector(), Color.Aqua);
+        //_deps._SpriteBatch.Draw(_deps.placeholder, _deps.CentreVector(), Color.Aqua);
     }
 }

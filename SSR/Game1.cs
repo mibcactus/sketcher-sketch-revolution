@@ -3,7 +3,7 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using Microsoft.Xna.Framework.Media;
 using OpenCvSharp;
 using OpenCvSharp.Text;
 
@@ -101,8 +101,9 @@ public class Game1 : Game {
         _deps.updateState();
         //_deps._state = _deps._state_dict["menu"];
 
-
-        // TODO: use this.Content to load your game content here
+        var song = Content.Load<Song>("mario");
+        MediaPlayer.Play(song);
+        MediaPlayer.IsRepeating = true;
     }
 
     protected override void Update(GameTime gameTime) {

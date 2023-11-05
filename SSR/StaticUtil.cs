@@ -63,11 +63,14 @@ public static class StaticUtil {
         try {
             string aaa = @"C:\Users\Milica\Documents\Coding\Hacknotts\sketcher-sketch-revolution\SSR\resources\" +
                          image + ".png";
-            Mat image_mat =
-                new Mat(aaa);
-
+            
             Mat drawing_mat = Texture2DtoMat(drawing);
 
+            Mat image_mat =
+                new Mat(aaa);
+            drawing_mat.ConvertTo(drawing_mat, image_mat.Type());
+
+            
             Mat result = image_mat;
             Cv2.Compare(image_mat, drawing_mat, result, CmpType.EQ);
             int similar = Cv2.CountNonZero(result);
