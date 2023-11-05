@@ -7,6 +7,8 @@ namespace SSR;
 
 public class Pen {
 
+    private const float MAX_RADIAN = 6.28f;
+    private const float Pi = 3.14f;
     private GamePadDPad free_dpad = new GamePadDPad(
         ButtonState.Released, ButtonState.Released, 
         ButtonState.Released, ButtonState.Released);
@@ -17,14 +19,17 @@ public class Pen {
     private Texture2D down_texture;
     private Texture2D up_texture;
     private Texture2D current_texture;
-    private Texture2D brush_texture;
 
     private Vector2 _position;
-    private Vector2 _sprite_origin;
+    private Vector2 _origin_offset;
     private float _angle = 0f;
 
-    private float _rotation_speed = 0.1f;
+    private float _rotation_speed = 0.18f;
+
+    private Vector2 vector_speed = Vector2.Zero;
     private int _pixel_speed = 10;
+
+    
     
     public bool isDown = true;
 
@@ -40,10 +45,9 @@ public class Pen {
         up_texture = _dependencyBox.loadTexture2D("pen_up");
         current_texture = down_texture;
 
-        brush_texture = StaticUtil.genBasicTexture2D(_dependencyBox._gamePointer.GraphicsDevice, Color.Yellow, 30, 30);
+        _origin_offset = new Vector2(up_texture.Width / 2, up_texture.Height / 2);
 
         _canvas = new Canvas(_dependencies, new Vector2(200,200));
-        _sprite_origin = new Vector2(0, current_texture.Height);
     }
 
     private bool RotatePressed(GamePadDPad dpad) {
@@ -62,6 +66,64 @@ public class Pen {
 
         return gamePadState.Triggers.Right < 0.5f;
     }
+
+    /*
+    private void old() {
+        if (dPad.Up == ButtonState.Pressed) {
+            displacement.Y += _pixel_speed;
+        }
+
+        if (dPad.Down == ButtonState.Pressed) {
+            displacement.Y -= _pixel_speed;
+        }
+
+        //if (RotatePressed(dPad)) {
+        
+        float temp_angle = 0;
+        if (dPad.Left == ButtonState.Pressed) {
+            temp_angle -= _rotation_speed;
+        }
+
+        if (dPad.Right == ButtonState.Pressed) {
+            temp_angle += _rotation_speed;
+        }
+
+        _angle += temp_angle;
+
+        if (_angle > MAX_RADIAN) {
+            _angle -= MAX_RADIAN;
+        }
+        else if (_angle < 0) {
+            _angle = MAX_RADIAN - _angle;
+        }
+        //}
+
+        double degree_angle = (180 / Pi) * _angle;
+        //double degree_angle = temp_angle * (180 / Pi);
+
+
+
+        float newx = (float)Math.Floor((Math.Cos(degree_angle) * displacement.X) -
+                                       (Math.Sin(degree_angle) * displacement.Y));
+        float newy = (float)Math.Floor((Math.Sin(degree_angle) * displacement.X) -
+                                       (Math.Cos(degree_angle) * displacement.Y));
+
+        displacement.X = newx;
+        displacement.Y = newy;
+
+        displacement.Normalize();
+        displacement = Vector2.Multiply(displacement, _pixel_speed);
+
+        if (dPad.Up == ButtonState.Pressed) {
+            _position -= displacement;
+        }
+
+        if (dPad.Down == ButtonState.Pressed) {
+            _position += displacement;
+        }
+            
+    }*/
+    
     
     public void Update(GameTime gameTime, GamePadState gamePadState) {
 
@@ -93,40 +155,73 @@ public class Pen {
             if (dPad.Down == ButtonState.Pressed) {
                 displacement.Y -= _pixel_speed;
             }
+            
 
-            if (RotatePressed(dPad)) {
-                float temp_angle = 0;
-                if (dPad.Left == ButtonState.Pressed) { 
-                    temp_angle -= _rotation_speed;
-                } 
-                if (dPad.Right == ButtonState.Pressed) {
-                   temp_angle += _rotation_speed;
-                }
-
-                _angle += temp_angle;
+            float temp_angle = 0;
+            if (dPad.Left == ButtonState.Pressed) {
+                temp_angle -= _rotation_speed;
             }
 
-            float newx =  (float)Math.Floor(Math.Cos(_angle) * displacement.X - Math.Sin(_angle) * displacement.Y);
-            float newy =  (float)Math.Floor(Math.Sin(_angle) * displacement.X - Math.Cos(_angle) * displacement.Y);
+            if (dPad.Right == ButtonState.Pressed) {
+                temp_angle += _rotation_speed;
+            }
+
+            _angle += temp_angle;
+
+            if (_angle > MAX_RADIAN) {
+                _angle -= MAX_RADIAN;
+            }
+            else if (_angle < 0) {
+                _angle = MAX_RADIAN - _angle;
+            }
+            //}
+
+            double degree_angle = (180 / Pi) * _angle;
+            //double degree_angle = temp_angle * (180 / Pi);
+
+
+
+            float newx = (float)Math.Floor((Math.Cos(degree_angle) * displacement.X) -
+                                           (Math.Sin(degree_angle) * displacement.Y));
+            float newy = (float)Math.Floor((Math.Sin(degree_angle) * displacement.X) -
+                                           (Math.Cos(degree_angle) * displacement.Y));
 
             displacement.X = newx;
             displacement.Y = newy;
-            
-            if(isDown) {
+
+            displacement.Normalize();
+            displacement = Vector2.Multiply(displacement, _pixel_speed);
+
+            if (dPad.Up == ButtonState.Pressed) {
+                _position -= displacement;
+            }
+
+            /*if (dPad.Down == ButtonState.Pressed) {
                 _position += displacement;
+            }*/
+            
+            
+            if (isDown) {
                 current_texture = down_texture;
-                _canvas.updateCanvas(_position);
-            } else {
+                _canvas.updateCanvas(_position + _origin_offset);
+            }
+            else {
                 current_texture = up_texture;
             }
-            
         }
-        
+
     }
 
+    public double toDegrees() {
+        return _angle * (180 / Pi);
+    }
+    public float returnAngle() {
+        return _angle;
+    }
+    
     public void Draw() {
         _canvas.drawCanvas();
-        _dependencyBox._SpriteBatch.Draw(current_texture, _position, Color.White);
-        //_dependencyBox._SpriteBatch.Draw(current_texture, _position, null, Color.White, _angle, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+        //_dependencyBox._SpriteBatch.Draw(current_texture, _position, Color.White);
+        _dependencyBox._SpriteBatch.Draw(current_texture, _position + _origin_offset, null, Color.White, _angle + MAX_RADIAN, _origin_offset, Vector2.One, SpriteEffects.None, 0f);
     }
 }

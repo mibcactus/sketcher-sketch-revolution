@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace SSR; 
 
 public class Canvas {
+    private const int BRUSH_DEFAULT = 5;
     private Texture2D canvas;
     private Color[] data;
     private int data_size;
@@ -12,9 +13,8 @@ public class Canvas {
 
     private Vector2 screen_position;
 
-    //private Rectangle brush;
-
-    private Rectangle? brush;
+    private int brush_size = 10;
+   
 
     public Canvas(DependencyContainer _dependencyContainer, Vector2 screenPosition,int canvas_width = 800, int canvas_height = 600) {
         _dependencyBox = _dependencyContainer;
@@ -28,9 +28,16 @@ public class Canvas {
         canvas.SetData(data);
 
         screen_position = screenPosition;
-        brush = new Rectangle(5, 5, 5, 5);
     }
 
+    public void setBrushSize(int size) {
+        brush_size = size;
+    }
+
+    public void resetBrushSize() {
+        brush_size = BRUSH_DEFAULT;
+    }
+    
     public Texture2D getCanvas() {
         return canvas;
     }
@@ -45,19 +52,14 @@ public class Canvas {
         
         float lx = target_location.X;
         float ly = target_location.Y;
-        /*if (lx < 0 || lx > canvas.Width || ly < 0 || ly > canvas.Height) {
-            return;
-        }*/
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                
-                if(lx+i < canvas.Width && ly+j < canvas.Height 
-                   && lx+i > 0 && ly+j > 0) {
-                    int aaax = (int)(lx + i);
-                    int aaay = (int)(ly + j);
-                    int aaa = aaax + aaay * canvas.Width;
-                    updateColourAtIndex(aaa);
+        for (int i = 0; i < brush_size; i++) {
+            for (int j = 0; j < brush_size; j++) {
+                if(lx+i < canvas.Width && ly+j < canvas.Height && lx+i > 0 && ly+j > 0) {
+                    int xx = (int)(lx + i);
+                    int yy = (int)(ly + j);
+                    int pixel = xx + yy * canvas.Width;
+                    updateColourAtIndex(pixel);
                 }
                 
             }

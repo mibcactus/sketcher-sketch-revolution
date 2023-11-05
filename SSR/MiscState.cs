@@ -54,11 +54,16 @@ public class MiscState : State {
         buttonstr.Add("Input buffer elapsed: " + _dependencyBox.hasInputBufferElapsed());
         buttonstr.Add("Pen down: " + _pen.isDown);
         
+        Color textcolour = Color.Indigo;
+        
         _dependencyBox._SpriteBatch.DrawString(_dependencyBox.Font(), buttonstr[0], new Vector2(30,70), Color.White);
         _dependencyBox._SpriteBatch.DrawString(_dependencyBox.Font(), buttonstr[1], new Vector2(30,90), Color.White);
         _dependencyBox._SpriteBatch.DrawString(_dependencyBox.Font(), buttonstr[2], new Vector2(30,110), Color.White);
         _dependencyBox._SpriteBatch.DrawString(_dependencyBox.Font(), buttonstr[3], new Vector2(30,140), Color.White);
         _dependencyBox._SpriteBatch.DrawString(_dependencyBox.Font(), buttonstr[4], new Vector2(30,160), Color.White);
+
+        string angle_str = "Current angle: " + _pen.returnAngle() + " is this many degrees: " + _pen.toDegrees();
+        _dependencyBox._SpriteBatch.DrawString(_dependencyBox.Font(), angle_str, new Vector2(30, 190), textcolour);
 
     }
 }
