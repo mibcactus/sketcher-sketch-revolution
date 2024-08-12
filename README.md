@@ -23,9 +23,9 @@ I used a wii DDR mat connected with a mayflash, it might have some weird connect
 Installation
 ------------
 
-good luck
+Should run straight away from Jetbrains Rider if you have monogame already installed. You'll have to build the game yourself if you want it as a .exe
 
-Technical stuff
+Technical details
 ----------------
 
 Framework - Monogame
